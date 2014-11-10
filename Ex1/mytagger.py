@@ -35,9 +35,7 @@ def calculate_ratios():
         word_count_dict[ word ] = word_count
 
 def replace_rare_words( infile ):
-    
     outfile = open("gene.train_mod", "w") 
-
     with open( infile ) as input:
         for line in input:
             if line.strip():
@@ -48,21 +46,53 @@ def replace_rare_words( infile ):
                     outfile.write( line )
             else:
                 outfile.write( line )
-                    
     outfile.close()
+
+def tagger( infile ):
+
+    outfile = open( "gene_dev.p1.out" , "w")
+
+    rare_tag = ""
+    rare_ratio = 0
+    for tag_ratio in word_dict[ "_RARE_" ]:
+        if tag_ratio[1] >= rare_ratio:
+            rare_ratio = tag_ratio[1]
+            rare_tag = tag_ratio[0]
+
+
+    with open( infile ) as input:
+        for line in input:
+            if line.strip():
+                if word_count_dict.get( line.strip() ):
+                    tag = ""
+                    ratio = 0
+                    for tag_ratio in word_dict[ line.strip() ]:
+                        if tag_ratio[1] >= ratio:
+                            ratio = tag_ratio[1]
+                            tag = tag_ratio[0]
+                    outfile.write( line.strip() + " " + tag + "\n" )
+                else:
+                    outfile.write( line.strip() + " " + rare_tag + "\n" )
+            else:
+                outfile.write( line )
+    outfile.close()
+                
 
 if __name__ == "__main__":
     
-    group_counts( sys.argv[1] )
+    counts_file = "gene.counts_mod"
+    dev_file = "gene.dev"
     
+    group_counts( counts_file )
     calculate_ratios()
 
-    replace_rare_words( sys.argv[2] ) 
+    tagger( dev_file )
+    #replace_rare_words( sys.argv[2] ) 
 
     #print [ w for w in word_dict ]
-    print word_dict["is"]
+    #print word_dict["is"]
     
-    print word_count_dict["is"]
+    #print word_count_dict["is"]
 
-    print unigram_dict.items()
+    #print unigram_dict.items()
 
